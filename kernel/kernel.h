@@ -14,8 +14,6 @@
 #include <stdbool.h>
 #include "MK22F51212.h"
 
-
-
 #ifndef ptrTask
 typedef void(*ptrTask_t)(void);
 #endif
@@ -75,7 +73,6 @@ typedef struct
 typedef struct no
 {
 	idTask_t index;
-	//ptrTask task;
 	strTask_t param;
 	struct no * next;
 }noKernel_t;

@@ -19,10 +19,8 @@ idTask_t id_idle;
  *
  */
 noKernel_t* kernel_init_list(void);
-//noKernel_t* kernel_list_insert(noKernel_t* list, idTask index, ptrTask task);
 noKernel_t* kernel_list_insert(noKernel_t* list, idTask_t index, strTask_t param);
 noKernel_t* kernel_list_get(noKernel_t* list, idTask_t index);
-//noKernel_t* kernel_list_remove(noKernel_t* list, idTask_t index);
 noKernel_t* kernel_list_remove(noKernel_t* list, idTask_t index, idTask_t max);
 void kernel_list_delete(noKernel_t* list);
 void kernel_task_idle(void);
@@ -41,29 +39,19 @@ void kernel_init(void)
 /**
  *
  */
-void kernel_task_delay(idTask_t id, kernelTick_t tick)
+void kernel_task_delay(idTask_t index, kernelTick_t tick)
 {
-	//uint8_t i = 0;
-//	noKernel_t* item;
-//	for(item = kernel_list; item != KERNEL_NULL; item = item->next)
-//	{
-//		if(item->index == id)
-//		{
-//			item->param.pausedtime = tick;
-//			item->param.state = Task_Paused;
-//			kernel_list = item;
-//			break;
-//		}
-//	}
+	uint8_t i = 0;
 
-	for(;kernel_list != KERNEL_NULL; kernel_list = kernel_list->next)
+	for(i=0;i<id;i++)
 	{
-		if(kernel_list->index == id)
+		if(kernel_list->index == index)
 		{
 			kernel_list->param.pausedtime = tick + kernel_tick_get();
 			kernel_list->param.state = Task_Paused;
 			break;
 		}
+		kernel_list = kernel_list->next;
 	}
 }
 
@@ -82,16 +70,10 @@ void kernel_run(void)
 		{
 			if(kernel_list->param.state == Task_Paused)
 			{
-				if(kernel_list->param.pausedtime < kernel_tick_get())
+				if(kernel_list->param.pausedtime <= kernel_tick_get())
 				{
 					kernel_list->param.state = Task_Ready;
 				}
-				/*
-				if(kernel_list->param.pausedtime > 0)
-					kernel_list->param.pausedtime--;
-				else
-					kernel_list->param.state = Task_Ready;
-				*/
 			}
 
 			kernel_list = kernel_list->next;
@@ -189,14 +171,12 @@ void kernel_run(void)
  */
 idTask_t kernel_add_task(ptrTask_t task, priorityTask_t priority, stateTask_t state)
 {
-	//static idTask_t id = 0;
 	strTask_t param;
 	param.pausedtime = 0;
 	param.priority = priority;
 	param.state = state;
 	param.task = task;
 	param.kernel_task_state = kernel_task_waiting;
-	//kernel_list = kernel_list_insert(kernel_list,id,task);
 	kernel_list = kernel_list_insert(kernel_list,++id,param);
 	return id;
 }
@@ -233,8 +213,8 @@ void kernel_idle(idTask_t id)
 {
 	kernel_task_delay(id,0);
 }
-/*************** List ********************************************/
 
+/*************** List ********************************************/
 /**
  * @brief
  */
@@ -286,43 +266,18 @@ noKernel_t* kernel_list_get(noKernel_t* list, idTask_t index)
  */
 noKernel_t* kernel_list_remove(noKernel_t* list, idTask_t index, idTask_t max)
 {
-	/*
-	noKernel_t* previous = KERNEL_NULL;
-	noKernel_t* item = list;
-
-	while((item != KERNEL_NULL) && (item->index != index))
-	{
-		previous = item;
-		item = item->next;
-	}
-
-	if(item == KERNEL_NULL)
-	{
-		return list;
-	}
-
-	if(previous == KERNEL_NULL)
-	{
-		list = item->next;
-	}
-	else
-	{
-		previous->next = item->next;
-	}
-	free(item);
-	//list = item;
-	return list;
-	*/
 	idTask_t i = 0;
-	noKernel_t* previous = KERNEL_NULL;
+	noKernel_t* previous;// = list;
 	noKernel_t* item = list;
 
-	for(i=1;i<max;i++)
+	for(i=1;i<(max+1);i++)
 	{
 		previous = item;
 		if(item->index == index)
+		{
+			item = item->next;
 			break; // achou
-
+		}
 		//previous = item;
 		item = item->next;
 	}
@@ -332,8 +287,26 @@ noKernel_t* kernel_list_remove(noKernel_t* list, idTask_t index, idTask_t max)
 	}
 	else
 	{
+		// Busca o no que aponta para index que  deseja remover
+		noKernel_t* no = item;
+
+		for(i=1;i<(max+1);i++)
+		{
+			if(no->next == previous)
+			{
+				no->next = previous->next;
+				break; // achou
+			}
+			no = no->next;
+		}
+		if(i > max)
+		{
+			return list;
+		}
+
 		free(previous);
-		return previous;
+		previous->next = item->next;
+		return no;
 	}
 }
 

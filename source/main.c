@@ -32,16 +32,20 @@ int main(void)
     PORT_SetPinMux(PORTA, 2U, kPORT_MuxAsGpio);
     PORT_SetPinMux(PORTD, 5U, kPORT_MuxAsGpio);
 
+    // Inicializa LED's
 	LED_RED_INIT(LOGIC_LED_OFF);
 	LED_BLUE_INIT(LOGIC_LED_ON);
 	LED_GREEN_INIT(LOGIC_LED_OFF);
 
+	// Inicializa kernel
 	kernel_init();
 
+	// Adiciona tarefa no kernel
 	red = kernel_add_task(task_led_red,Priority_High,Task_Ready);
 	blue = kernel_add_task(task_led_blue,Priority_High,Task_Ready);
 	kernel_add_task_ilde(task_led_green);
 
+	// Executa Kernel
 	kernel_run();
 
 	for(;;)
@@ -56,24 +60,20 @@ int main(void)
  */
 void task_led_red(void)
 {
-	uint32_t i = 0;
 	static uint8_t counter = 0;
 
 	LED_RED_TOGGLE();
-/*	for(i=0;i<100000;i++);
-	LED_RED_TOGGLE();
-	for(i=0;i<100000;i++);
-	*/
 
 	counter++;
 	if(counter > 100)
 	{
-		//counter = 0;
+		// Deleta Task RED
+		counter = 0;
 		kernel_task_delete(red);
+		return;
 	}
-
-	kernel_idle(red);
-	//kernel_task_delay(red,0);
+	// Pausa Task RED por 1000 tick's
+	kernel_task_delay(red,1000);
 }
 
 /**
@@ -81,24 +81,9 @@ void task_led_red(void)
  */
 void task_led_blue(void)
 {
-	uint32_t i = 0;
-	static uint8_t counter = 0;
-
 	LED_BLUE_TOGGLE();
-/*	for(i=0;i<100000;i++);
-	LED_BLUE_TOGGLE();
-	for(i=0;i<100000;i++);
-	*/
-/*
-	counter++;
-	if(counter > 200)
-	{
-		counter = 0;
-		red = kernel_add_task(task_led_red,Priority_High,Task_Ready);
-	}
-*/
-	kernel_idle(blue);
-	//kernel_task_delay(blue,0);
+	// Pausa Task BLUE por 2000 tick's
+	kernel_task_delay(blue,2000);
 }
 
 /**
@@ -107,10 +92,7 @@ void task_led_blue(void)
 void task_led_green(void)
 {
 	uint32_t i = 0;
-/*
+
 	LED_GREEN_TOGGLE();
-	for(i=0;i<100000;i++);
-	LED_GREEN_TOGGLE();
-	for(i=0;i<100000;i++);
-	*/
+	for(i=0;i<1000;i++);
 }
