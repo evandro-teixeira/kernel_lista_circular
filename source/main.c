@@ -9,6 +9,8 @@
 #include "fsl_port.h"
 #include "../kernel/kernel.h"
 
+#define DELAY_LED_GREEN		50000
+
 void task_led_red(void);
 void task_led_blue(void);
 void task_led_green(void);
@@ -81,7 +83,16 @@ void task_led_red(void)
  */
 void task_led_blue(void)
 {
+	static uint8_t counter = 0;
+
 	LED_BLUE_TOGGLE();
+
+	counter++;
+	if(counter > 40)
+	{
+		counter = 0;
+		red = kernel_add_task(task_led_red,Priority_High,Task_Ready);
+	}
 	// Pausa Task BLUE por 2000 tick's
 	kernel_task_delay(blue,2000);
 }
@@ -91,8 +102,12 @@ void task_led_blue(void)
  */
 void task_led_green(void)
 {
-	uint32_t i = 0;
+	static uint32_t i = 0;
 
-	LED_GREEN_TOGGLE();
-	for(i=0;i<1000;i++);
+	i++;
+	if(i > DELAY_LED_GREEN)
+	{
+		i = 0;
+		LED_GREEN_TOGGLE();
+	}
 }

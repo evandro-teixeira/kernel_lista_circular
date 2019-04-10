@@ -12,7 +12,7 @@ static idTask_t id = 0;
 static ptrTask_t idleTask;
 static kernelTick_t kernelTick = 0;
 noKernel_t* kernel_list;
-noKernel_t* kernel_list_init;
+//noKernel_t* kernel_list_init;
 idTask_t id_idle;
 
 /**
