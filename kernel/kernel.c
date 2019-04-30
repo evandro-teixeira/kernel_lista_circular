@@ -58,6 +58,42 @@ void kernel_task_delay(idTask_t index, kernelTick_t tick)
 /**
  *
  */
+void kernel_task_blocked(idTask_t index)
+{
+	uint8_t i = 0;
+
+	for(i=0;i<id;i++)
+	{
+		if(kernel_list->index == index)
+		{
+			kernel_list->param.state = Task_Blocked;
+			break;
+		}
+		kernel_list = kernel_list->next;
+	}
+}
+
+/**
+ *
+ */
+void kernel_task_unlocked(idTask_t index)
+{
+	uint8_t i = 0;
+
+	for(i=0;i<id;i++)
+	{
+		if(kernel_list->index == index)
+		{
+			kernel_list->param.state = Task_Ready;
+			break;
+		}
+		kernel_list = kernel_list->next;
+	}
+}
+
+/**
+ *
+ */
 void kernel_run(void)
 {
 	ptrTask_t taskRun = {KERNEL_NULL};

@@ -47,7 +47,6 @@ typedef enum
 	Task_Ready = 0,
 	Task_Blocked,
 	Task_Paused,
-	//Task_Deleted,
 }stateTask_t;
 
 typedef enum
@@ -85,5 +84,7 @@ idTask_t kernel_add_task(ptrTask_t task, priorityTask_t priority, stateTask_t st
 void kernel_task_delete(idTask_t index);
 void kernel_task_delay(idTask_t id, kernelTick_t tick);
 void kernel_idle(idTask_t id);
+void kernel_task_blocked(idTask_t index);
+void kernel_task_unlocked(idTask_t index);
 
 #endif /* KERNEL_KERNEL_H_ */
